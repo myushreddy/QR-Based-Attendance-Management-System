@@ -1,0 +1,2 @@
+# QR-Based-Attendance-Management-System
+Modern QR-based attendance system for educational institutions. Features dynamic 30-second refresh QR codes, dual student/faculty authentication, tablet scanning, and real-time logging. Eliminates proxy attendance with encrypted, time-sensitive codes. Built with Next.js, TypeScript &amp; Tailwind CSS.
