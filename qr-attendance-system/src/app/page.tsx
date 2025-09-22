@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { QrCode, UserCheck, GraduationCap, Shield } from 'lucide-react';
 import StudentRegistration from './components/StudentRegistration';
-import AdminDashboard from './components/AdminDashboard';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [userType, setUserType] = useState<'student' | 'faculty'>('student');
   const [showRegistration, setShowRegistration] = useState(false);
-  const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [credentials, setCredentials] = useState({
     username: '',
     password: ''
@@ -25,18 +25,6 @@ export default function LoginPage() {
     );
   }
 
-  // Show admin dashboard if admin is logged in
-  if (showAdminDashboard) {
-    return (
-      <AdminDashboard 
-        onLogout={() => {
-          setShowAdminDashboard(false);
-          setCredentials({ username: '', password: '' });
-        }}
-      />
-    );
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -47,8 +35,11 @@ export default function LoginPage() {
     // Check for admin credentials
     if (userType === 'faculty' && credentials.username === 'admin@aimscs' && credentials.password === 'admin123') {
       console.log('Admin login successful');
+      // Set authentication flag
+      localStorage.setItem('adminAuthenticated', 'true');
       setIsLoading(false);
-      setShowAdminDashboard(true);
+      // Navigate to admin page
+      router.push('/admin_page');
       return;
     }
     
