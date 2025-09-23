@@ -42,12 +42,38 @@ export default function LoginPage() {
       router.push('/admin_page');
       return;
     }
+
+    // Check for faculty credentials
+    if (userType === 'faculty') {
+      const storedFaculty = localStorage.getItem('faculty');
+      if (storedFaculty) {
+        const facultyList = JSON.parse(storedFaculty);
+        const faculty = facultyList.find((f: any) => 
+          f.facultyId === credentials.username && f.password === credentials.password
+        );
+        
+        if (faculty) {
+          console.log('Faculty login successful');
+          // Set authentication flag and current faculty
+          localStorage.setItem('facultyAuthenticated', 'true');
+          localStorage.setItem('currentFaculty', JSON.stringify(faculty));
+          setIsLoading(false);
+          // Navigate to faculty page
+          router.push('/faculty_page');
+          return;
+        }
+      }
+    }
     
     console.log('Login attempt:', { userType, credentials });
     setIsLoading(false);
     
-    // TODO: Implement actual authentication logic
-    alert(`${userType} login successful! (This is a demo)`);
+    // TODO: Implement actual authentication logic for students
+    if (userType === 'student') {
+      alert(`Student login successful! (This is a demo)`);
+    } else {
+      alert('Invalid credentials! Please check your Faculty ID and password.');
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {

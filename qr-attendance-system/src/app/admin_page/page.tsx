@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { Plus, Users, LogOut, Search, Edit, Trash2 } from 'lucide-react';
 
@@ -308,6 +309,17 @@ function AddFacultyModal({ onClose, onAdd }: AddFacultyModalProps) {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden';
+    return () => {
+      setMounted(false);
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
 
   const departmentOptions = [
     'Computer Science',
@@ -372,9 +384,27 @@ function AddFacultyModal({ onClose, onAdd }: AddFacultyModalProps) {
     }
   };
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+  if (!mounted) return null;
+
+  const modalContent = (
+    <div 
+      className="fixed inset-0 flex items-center justify-center p-4" 
+      style={{ 
+        zIndex: 9999,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md relative" onClick={(e) => e.stopPropagation()}>
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">Add New Faculty</h3>
         </div>
@@ -475,6 +505,8 @@ function AddFacultyModal({ onClose, onAdd }: AddFacultyModalProps) {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
 
 // Edit Faculty Modal Component
@@ -494,6 +526,17 @@ function EditFacultyModal({ faculty, onClose, onEdit }: EditFacultyModalProps) {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden';
+    return () => {
+      setMounted(false);
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
 
   const departmentOptions = [
     'Computer Science',
@@ -563,9 +606,27 @@ function EditFacultyModal({ faculty, onClose, onEdit }: EditFacultyModalProps) {
     }
   };
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+  if (!mounted) return null;
+
+  const modalContent = (
+    <div 
+      className="fixed inset-0 flex items-center justify-center p-4" 
+      style={{ 
+        zIndex: 9999,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md relative" onClick={(e) => e.stopPropagation()}>
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">Edit Faculty Member</h3>
         </div>
@@ -666,4 +727,6 @@ function EditFacultyModal({ faculty, onClose, onEdit }: EditFacultyModalProps) {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
