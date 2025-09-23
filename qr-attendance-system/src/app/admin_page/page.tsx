@@ -10,6 +10,7 @@ interface Faculty {
   email: string;
   facultyId: string;
   department: string;
+  password: string;
   createdAt: string;
 }
 
@@ -17,6 +18,8 @@ export default function AdminPage() {
   const router = useRouter();
   const [faculty, setFaculty] = useState<Faculty[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingFaculty, setEditingFaculty] = useState<Faculty | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   // Check authentication on page load
@@ -56,10 +59,25 @@ export default function AdminPage() {
     setShowAddModal(false);
   };
 
+  const handleEditFaculty = (updatedFaculty: Faculty) => {
+    const updatedFacultyList = faculty.map(member => 
+      member.id === updatedFaculty.id ? updatedFaculty : member
+    );
+    setFaculty(updatedFacultyList);
+    localStorage.setItem('faculty', JSON.stringify(updatedFacultyList));
+    setShowEditModal(false);
+    setEditingFaculty(null);
+  };
+
   const handleDeleteFaculty = (id: string) => {
     const updatedFaculty = faculty.filter(member => member.id !== id);
     setFaculty(updatedFaculty);
     localStorage.setItem('faculty', JSON.stringify(updatedFaculty));
+  };
+
+  const handleEditClick = (facultyMember: Faculty) => {
+    setEditingFaculty(facultyMember);
+    setShowEditModal(true);
   };
 
   const handleLogout = () => {
@@ -224,7 +242,10 @@ export default function AdminPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
-                        <button className="text-blue-600 hover:text-blue-900">
+                        <button 
+                          onClick={() => handleEditClick(member)}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
                           <Edit className="h-4 w-4" />
                         </button>
                         <button 
@@ -255,6 +276,18 @@ export default function AdminPage() {
           onAdd={handleAddFaculty}
         />
       )}
+
+      {/* Edit Faculty Modal */}
+      {showEditModal && editingFaculty && (
+        <EditFacultyModal
+          faculty={editingFaculty}
+          onClose={() => {
+            setShowEditModal(false);
+            setEditingFaculty(null);
+          }}
+          onEdit={handleEditFaculty}
+        />
+      )}
     </div>
   );
 }
@@ -270,7 +303,8 @@ function AddFacultyModal({ onClose, onAdd }: AddFacultyModalProps) {
     fullName: '',
     email: '',
     facultyId: '',
-    department: ''
+    department: '',
+    password: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -309,6 +343,12 @@ function AddFacultyModal({ onClose, onAdd }: AddFacultyModalProps) {
       newErrors.department = 'Please select a department';
     }
 
+    if (!formData.password.trim()) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters long';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -341,55 +381,69 @@ function AddFacultyModal({ onClose, onAdd }: AddFacultyModalProps) {
 
         <form className="px-6 py-4 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-900 mb-1">
               Full Name
             </label>
             <input
               type="text"
               value={formData.fullName}
               onChange={(e) => handleInputChange('fullName', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               placeholder="Enter full name"
             />
             {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-900 mb-1">
               Email Address
             </label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               placeholder="Enter email address"
             />
             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-900 mb-1">
               Faculty ID
             </label>
             <input
               type="text"
               value={formData.facultyId}
               onChange={(e) => handleInputChange('facultyId', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               placeholder="Enter faculty ID"
             />
             {errors.facultyId && <p className="text-red-500 text-xs mt-1">{errors.facultyId}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-900 mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              value={formData.password}
+              onChange={(e) => handleInputChange('password', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              placeholder="Enter password (min 6 characters)"
+            />
+            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">
               Department
             </label>
             <select
               value={formData.department}
               onChange={(e) => handleInputChange('department', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
             >
               <option value="">Select Department</option>
               {departmentOptions.map(dept => (
@@ -416,6 +470,197 @@ function AddFacultyModal({ onClose, onAdd }: AddFacultyModalProps) {
             }`}
           >
             {isLoading ? 'Adding...' : 'Add Faculty'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Edit Faculty Modal Component
+interface EditFacultyModalProps {
+  faculty: Faculty;
+  onClose: () => void;
+  onEdit: (faculty: Faculty) => void;
+}
+
+function EditFacultyModal({ faculty, onClose, onEdit }: EditFacultyModalProps) {
+  const [formData, setFormData] = useState({
+    fullName: faculty.fullName,
+    email: faculty.email,
+    facultyId: faculty.facultyId,
+    department: faculty.department,
+    password: faculty.password
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  const departmentOptions = [
+    'Computer Science',
+    'Information Technology',
+    'Electronics',
+    'Mechanical',
+    'Civil',
+    'Electrical',
+    'Chemical',
+    'Mathematics',
+    'Physics',
+    'Chemistry'
+  ];
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = 'Full name is required';
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    if (!formData.facultyId.trim()) {
+      newErrors.facultyId = 'Faculty ID is required';
+    }
+
+    if (!formData.department) {
+      newErrors.department = 'Please select a department';
+    }
+
+    if (!formData.password.trim()) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters long';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const updatedFaculty: Faculty = {
+      ...faculty,
+      ...formData
+    };
+    
+    onEdit(updatedFaculty);
+    setIsLoading(false);
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">Edit Faculty Member</h3>
+        </div>
+
+        <form className="px-6 py-4 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">
+              Full Name
+            </label>
+            <input
+              type="text"
+              value={formData.fullName}
+              onChange={(e) => handleInputChange('fullName', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              placeholder="Enter full name"
+            />
+            {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">
+              Email Address
+            </label>
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleInputChange('email', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              placeholder="Enter email address"
+            />
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">
+              Faculty ID
+            </label>
+            <input
+              type="text"
+              value={formData.facultyId}
+              onChange={(e) => handleInputChange('facultyId', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              placeholder="Enter faculty ID"
+            />
+            {errors.facultyId && <p className="text-red-500 text-xs mt-1">{errors.facultyId}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              value={formData.password}
+              onChange={(e) => handleInputChange('password', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              placeholder="Enter password (min 6 characters)"
+            />
+            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-1">
+              Department
+            </label>
+            <select
+              value={formData.department}
+              onChange={(e) => handleInputChange('department', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+            >
+              <option value="">Select Department</option>
+              {departmentOptions.map(dept => (
+                <option key={dept} value={dept}>{dept}</option>
+              ))}
+            </select>
+            {errors.department && <p className="text-red-500 text-xs mt-1">{errors.department}</p>}
+          </div>
+        </form>
+
+        <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={isLoading}
+            className={`px-4 py-2 text-white rounded-lg transition-colors ${
+              isLoading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'
+            }`}
+          >
+            {isLoading ? 'Updating...' : 'Update Faculty'}
           </button>
         </div>
       </div>
