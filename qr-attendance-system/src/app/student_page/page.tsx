@@ -114,12 +114,19 @@ export default function StudentPage() {
                 <p className="text-sm text-gray-600">Department: <span className="font-medium">{student.department}</span></p>
               </div>
             </div>
-            <div className="text-center">
+            <div className="text-center space-y-4">
               <div className="bg-gray-100 p-4 rounded-lg">
                 <QrCode className="h-16 w-16 text-gray-600 mx-auto mb-2" />
                 <p className="text-xs text-gray-500">Your QR Code</p>
                 <p className="text-sm font-mono font-medium">{studentQRCode}</p>
               </div>
+              <button
+                onClick={() => router.push('/student_scanner')}
+                className="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+              >
+                <QrCode className="h-5 w-5 mr-2" />
+                Mark Attendance
+              </button>
             </div>
           </div>
         </div>

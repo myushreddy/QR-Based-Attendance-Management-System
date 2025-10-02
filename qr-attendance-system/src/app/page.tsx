@@ -68,9 +68,56 @@ export default function LoginPage() {
     console.log('Login attempt:', { userType, credentials });
     setIsLoading(false);
     
-    // TODO: Implement actual authentication logic for students
+    // Student authentication
     if (userType === 'student') {
-      alert(`Student login successful! (This is a demo)`);
+      // Get or create student data
+      const storedStudents = localStorage.getItem('students');
+      let students = [];
+      
+      if (storedStudents) {
+        students = JSON.parse(storedStudents);
+      } else {
+        // Create demo students if none exist
+        students = [
+          {
+            id: '1',
+            fullName: 'Ayush',
+            rollNumber: '22XV1M6705',
+            year: '2022-2026',
+            course: 'CSE-DS',
+            department: 'Computer Science',
+            password: 'password123',
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: '2',
+            fullName: 'Priya Patel',
+            rollNumber: '21CSE002',
+            year: '2021-2025',
+            course: 'B.Tech Computer Science',
+            department: 'Computer Science',
+            password: 'password123',
+            createdAt: new Date().toISOString()
+          }
+        ];
+        localStorage.setItem('students', JSON.stringify(students));
+      }
+      
+      // Find student by roll number and password
+      const student = students.find((s: any) => 
+        s.rollNumber === credentials.username && s.password === credentials.password
+      );
+      
+      if (student) {
+        console.log('Student login successful');
+        localStorage.setItem('studentAuthenticated', 'true');
+        localStorage.setItem('currentStudent', JSON.stringify(student));
+        router.push('/student_page');
+        return;
+      } else {
+        alert('Invalid roll number or password! For demo, use roll number: 22XV1M6705 and password: password123');
+        return;
+      }
     } else {
       alert('Invalid credentials! Please check your Faculty ID and password. Otherwise contact admin.');
     }
