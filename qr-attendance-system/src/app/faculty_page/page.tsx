@@ -292,7 +292,9 @@ export default function FacultyPage() {
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-900 font-semibold"
+                  placeholder="Date"
+                  style={{ color: '#303133ff', fontWeight: 600 }}
                 />
               </div>
 
@@ -305,7 +307,7 @@ export default function FacultyPage() {
                     placeholder="Search students..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-700"
                   />
                 </div>
               </div>
@@ -315,9 +317,10 @@ export default function FacultyPage() {
                 <select
                   value={filterCourse}
                   onChange={(e) => setFilterCourse(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 font-semibold"
+                  style={{ color: '#1a202c', fontWeight: 600 }}
                 >
-                  <option value="">All Courses</option>
+                  <option value="" className="text-gray-900 font-semibold">All Courses</option>
                   {uniqueCourses.map(course => (
                     <option key={course} value={course}>{course}</option>
                   ))}
@@ -329,9 +332,10 @@ export default function FacultyPage() {
                 <select
                   value={filterYear}
                   onChange={(e) => setFilterYear(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 font-semibold"
+                  style={{ color: '#1a202c', fontWeight: 600 }}
                 >
-                  <option value="">All Years</option>
+                  <option value="" className="text-gray-900 font-semibold">All Years</option>
                   {uniqueYears.map(year => (
                     <option key={year} value={year}>{year}</option>
                   ))}

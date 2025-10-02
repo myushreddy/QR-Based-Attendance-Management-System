@@ -22,6 +22,8 @@ export default function AdminPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingFaculty, setEditingFaculty] = useState<Faculty | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   // Check authentication on page load
   useEffect(() => {
@@ -70,10 +72,23 @@ export default function AdminPage() {
     setEditingFaculty(null);
   };
 
-  const handleDeleteFaculty = (id: string) => {
-    const updatedFaculty = faculty.filter(member => member.id !== id);
-    setFaculty(updatedFaculty);
-    localStorage.setItem('faculty', JSON.stringify(updatedFaculty));
+  // Only show confirmation popup, do not actually delete
+  const handleDeleteClick = (id: string) => {
+    setDeleteTargetId(id);
+    setShowDeleteConfirm(true);
+  };
+  const handleConfirmDelete = () => {
+    if (deleteTargetId) {
+      const updatedFaculty = faculty.filter(member => member.id !== deleteTargetId);
+      setFaculty(updatedFaculty);
+      localStorage.setItem('faculty', JSON.stringify(updatedFaculty));
+    }
+    setShowDeleteConfirm(false);
+    setDeleteTargetId(null);
+  };
+  const handleCancelDelete = () => {
+    setShowDeleteConfirm(false);
+    setDeleteTargetId(null);
   };
 
   const handleEditClick = (facultyMember: Faculty) => {
@@ -190,7 +205,7 @@ export default function AdminPage() {
                 placeholder="Search faculty..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-700"
               />
             </div>
           </div>
@@ -250,11 +265,34 @@ export default function AdminPage() {
                           <Edit className="h-4 w-4" />
                         </button>
                         <button 
-                          onClick={() => handleDeleteFaculty(member.id)}
+                          onClick={() => handleDeleteClick(member.id)}
                           className="text-red-600 hover:text-red-900"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
+      {/* Delete Confirmation Popup */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{background: 'rgba(0,0,0,0.4)'}}>
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Delete Faculty</h3>
+            <p className="text-gray-700 mb-6">Do you really want to delete this faculty member?</p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={handleCancelDelete}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
                       </div>
                     </td>
                   </tr>

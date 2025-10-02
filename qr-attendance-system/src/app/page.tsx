@@ -72,7 +72,7 @@ export default function LoginPage() {
     if (userType === 'student') {
       alert(`Student login successful! (This is a demo)`);
     } else {
-      alert('Invalid credentials! Please check your Faculty ID and password.');
+      alert('Invalid credentials! Please check your Faculty ID and password. Otherwise contact admin.');
     }
   };
 
