@@ -287,7 +287,6 @@ export default function StudentPage() {
     </div>
   );
 }
-
 function calculateDuration(checkIn: string, checkOut: string): string {
   const [inHours, inMinutes, inSeconds] = checkIn.split(':').map(Number);
   const [outHours, outMinutes, outSeconds] = checkOut.split(':').map(Number);
