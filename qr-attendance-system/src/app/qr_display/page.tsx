@@ -12,7 +12,6 @@ export default function QRDisplay() {
   const [sessionActive, setSessionActive] = useState(true);
 
   useEffect(() => {
-    // Check faculty authentication
     const facultyAuth = localStorage.getItem('facultyAuthenticated');
     const currentFaculty = localStorage.getItem('currentFaculty');
     
